@@ -10,7 +10,6 @@ class BMICalculator:
         self.root.title("BMI Calculator By Ayon")
         self.data = {}
 
-        
         self.info_frame = tk.Frame(root)
         self.info_frame.pack(pady=10)
 
@@ -29,7 +28,6 @@ class BMICalculator:
         self.calculate_button = tk.Button(self.info_frame, text="Calculate BMI", command=self.calculate_bmi)
         self.calculate_button.grid(row=3, columnspan=2, pady=10)
 
-      
         self.output_frame = tk.Frame(root)
         self.output_frame.pack(pady=10)
 
@@ -41,7 +39,6 @@ class BMICalculator:
         self.status_label = tk.Label(self.output_frame, text="--")
         self.status_label.grid(row=1, column=1, padx=5, pady=5)
 
-        
         self.data_frame = tk.Frame(root)
         self.data_frame.pack(pady=10)
 
@@ -105,16 +102,29 @@ class BMICalculator:
             messagebox.showinfo("No Data", "No data to plot.")
             return
 
+        plt.figure(figsize=(10, 6))
         for name, records in self.data.items():
-            timestamps = [datetime.datetime.strptime(r["timestamp"], "%Y-%m-%d %H:%M:%S") for r in records]
-            bmis = [r["bmi"] for r in records]
-            plt.plot(timestamps, bmis, label=name)
+            try:
+                timestamps = [datetime.datetime.strptime(r["timestamp"], "%Y-%m-%d %H:%M:%S") for r in records]
+                bmis = [r["bmi"] for r in records]
 
-        plt.xlabel("Timestamp")
-        plt.ylabel("BMI")
-        plt.title("BMI Trend Analysis")
-        plt.legend()
+                sorted_data = sorted(zip(timestamps, bmis))
+                sorted_timestamps, sorted_bmis = zip(*sorted_data)
+
+                plt.plot(sorted_timestamps, sorted_bmis, label=name)
+            except Exception as e:
+                messagebox.showerror("Plot Error", f"Error plotting data for {name}: {str(e)}")
+                return
+
+        plt.gcf().autofmt_xdate()
+        plt.xlabel("Timestamp", fontsize=12)
+        plt.ylabel("BMI", fontsize=12)
+        plt.title("BMI Trend Analysis", fontsize=14)
+        plt.legend(title="Users")
+        plt.grid(True)
+        plt.tight_layout()
         plt.show()
+
 
 if __name__ == "__main__":
     root = tk.Tk()
